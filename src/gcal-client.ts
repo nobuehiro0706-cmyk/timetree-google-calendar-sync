@@ -116,10 +116,16 @@ export class GCalClient {
     if (event.allDay) {
       body.start = { date: formatDate(event.start) };
       body.end = { date: formatDate(event.end) };
-    } else {
-      body.start = { dateTime: event.start.toISOString() };
-      body.end = { dateTime: event.end.toISOString() };
-    }
+} else {
+  body.start = {
+    dateTime: event.start.toISOString(),
+    timeZone: "Asia/Tokyo",
+  };
+  body.end = {
+    dateTime: event.end.toISOString(),
+    timeZone: "Asia/Tokyo",
+  };
+}
 
     if (event.recurrence.length > 0) {
       body.recurrence = event.recurrence;
