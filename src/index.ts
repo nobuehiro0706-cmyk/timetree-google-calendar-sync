@@ -68,6 +68,16 @@ async function main(): Promise<void> {
     `\nDiff: ${diff.toCreate.length} to create, ${diff.toUpdate.length} to update, ${diff.toDelete.length} to delete`
   );
 
+  // 差分確認専用モード：予定を変更せず終了
+  if (process.env.DRY_RUN === "true") {
+    console.log("\n=== DRY RUN ===");
+    console.log(`Create: ${diff.toCreate.length}`);
+    console.log(`Update: ${diff.toUpdate.length}`);
+    console.log(`Delete: ${diff.toDelete.length}`);
+    console.log("No Google Calendar events were modified.");
+    return;
+  }
+
   // 7. 差分適用
   if (
     diff.toCreate.length === 0 &&
