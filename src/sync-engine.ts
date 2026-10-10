@@ -37,7 +37,10 @@ export class SyncEngine {
       } else {
         // 存在する → lastModified を比較して更新判定
         const sourceModified = event.lastModified?.toISOString() ?? "";
-        if (sourceModified !== existing.lastModified) {
+if (
+  sourceModified !== existing.lastModified ||
+  process.env.FORCE_UPDATE_ALL === "true"
+) {
           toUpdate.push({
             source: event,
             googleEventId: existing.googleEventId,
@@ -47,6 +50,15 @@ export class SyncEngine {
     }
 
     // Google Calendar にあって TimeTree にないイベント → 削除
+    // 取得件数が異常に少ない場合は、誤削除を防ぐため同期を中止
+if (
+  syncedEvents.length >= 100 &&
+  sourceEvents.length < syncedEvents.length * 0.8
+) {
+  throw new Error(
+    `Safety stop: TimeTree events=${sourceEvents.length}, Google events=${syncedEvents.length}`
+  );
+}
     const toDelete: SyncDiff["toDelete"] = [];
     for (const se of syncedEvents) {
       if (!sourceUids.has(se.timetreeUid)) {
