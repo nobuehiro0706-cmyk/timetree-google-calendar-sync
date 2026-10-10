@@ -41,6 +41,7 @@ jobs:
           GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/google-credentials.json
           DRY_RUN: 'true'
+          FORCE_UPDATE_ALL: 'true'
         run: npx tsx src/index.ts
 
       - name: Clean up credentials
