@@ -77,7 +77,21 @@ async function main(): Promise<void> {
     console.log("No Google Calendar events were modified.");
     return;
   }
+// 1件だけの試験同期に限定する
+if (process.env.SINGLE_CREATE_TEST === "true") {
+  if (diff.toCreate.length !== 1) {
+    throw new Error(
+      `Expected exactly 1 event to create, found ${diff.toCreate.length}`
+    );
+  }
 
+  diff.toUpdate.length = 0;
+  diff.toDelete.length = 0;
+
+  console.log("=== SINGLE CREATE TEST ===");
+  console.log("Only 1 new event will be created.");
+  console.log("Existing events will not be updated or deleted.");
+}
   // 7. 差分適用
   if (
     diff.toCreate.length === 0 &&
