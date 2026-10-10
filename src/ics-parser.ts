@@ -57,29 +57,34 @@ function extractRecurrence(vevent: VEvent): string[] {
   return rules;
 }
 
+
 /** ICS の CATEGORIES からラベル・カテゴリー名を取得 */
 function extractCategories(vevent: VEvent): string[] {
-  const raw = (vevent as VEvent & {
-    categories?: unknown;
-  }).categories;
+  const raw: unknown = (vevent as unknown as Record<string, unknown>)
+    .categories;
 
-  if (!raw) return [];
+  if (raw == null) return [];
 
-  const values = Array.isArray(raw) ? raw : [raw];
+  const values: unknown[] = Array.isArray(raw) ? raw : [raw];
 
   return values
-    .flatMap((value) => {
-      const text =
-        typeof value === "string"
-          ? value
-          : typeof value === "object" &&
-              value !== null &&
-              "val" in value &&
-              typeof value.val === "string"
-            ? value.val
-            : "";
+    .flatMap((value): string[] => {
+      let text = "";
 
-      return text.split(/(?<!\\),/);
+      if (typeof value === "string") {
+        text = value;
+      } else if (
+        typeof value === "object" &&
+        value !== null &&
+        "val" in value
+      ) {
+        const val: unknown = value.val;
+        if (typeof val === "string") {
+          text = val;
+        }
+      }
+
+      return text ? text.split(/(?<!\\),/) : [];
     })
     .map((value) => value.replace(/\\,/g, ",").trim())
     .filter(Boolean);
