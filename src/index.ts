@@ -84,7 +84,16 @@ if (process.env.SINGLE_CREATE_TEST === "true") {
       `Expected exactly 1 event to create, found ${diff.toCreate.length}`
     );
   }
+const target = diff.toCreate[0];
 
+if (
+  target.summary !== "役員会" ||
+  target.start.toISOString() !== "2023-03-02T05:30:00.000Z"
+) {
+  throw new Error(
+    "Safety stop: The event is not the expected board meeting."
+  );
+}
   diff.toUpdate.length = 0;
   diff.toDelete.length = 0;
 
