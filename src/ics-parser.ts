@@ -23,6 +23,7 @@ export function parseIcsFile(filePath: string): CalendarEvent[] {
       summary: parameterValueToString(vevent.summary),
       description: parameterValueToString(vevent.description),
       location: parameterValueToString(vevent.location),
+      categories: extractCategories(vevent),
       start: new Date(vevent.start),
       end: new Date(vevent.end),
       allDay,
@@ -54,4 +55,32 @@ function extractRecurrence(vevent: VEvent): string[] {
   }
 
   return rules;
+}
+
+/** ICS の CATEGORIES からラベル・カテゴリー名を取得 */
+function extractCategories(vevent: VEvent): string[] {
+  const raw = (vevent as VEvent & {
+    categories?: unknown;
+  }).categories;
+
+  if (!raw) return [];
+
+  const values = Array.isArray(raw) ? raw : [raw];
+
+  return values
+    .flatMap((value) => {
+      const text =
+        typeof value === "string"
+          ? value
+          : typeof value === "object" &&
+              value !== null &&
+              "val" in value &&
+              typeof value.val === "string"
+            ? value.val
+            : "";
+
+      return text.split(/(?<!\\),/);
+    })
+    .map((value) => value.replace(/\\,/g, ",").trim())
+    .filter(Boolean);
 }
