@@ -1,0 +1,48 @@
+
+name: Check TimeTree Labels
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-labels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install TimeTree Exporter
+        run: pip install timetree-exporter
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Decode Google credentials
+        run: echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > /tmp/google-credentials.json
+
+      - name: Check TimeTree labels
+        env:
+          TIMETREE_EMAIL: ${{ secrets.TIMETREE_EMAIL }}
+          TIMETREE_PASSWORD: ${{ secrets.TIMETREE_PASSWORD }}
+          TIMETREE_CALENDAR_CODE: ${{ secrets.TIMETREE_CALENDAR_CODE }}
+          GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/google-credentials.json
+          CHECK_LABELS: 'true'
+        run: npx tsx src/index.ts
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f /tmp/google-credentials.json
