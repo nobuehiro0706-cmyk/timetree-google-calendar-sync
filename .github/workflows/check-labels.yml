@@ -40,7 +40,7 @@ jobs:
           TIMETREE_CALENDAR_CODE: ${{ secrets.TIMETREE_CALENDAR_CODE }}
           GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/google-credentials.json
-          SINGLE_CREATE_TEST: 'true'
+          DRY_RUN: 'true'
         run: npx tsx src/index.ts
 
       - name: Clean up credentials
