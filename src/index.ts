@@ -24,6 +24,34 @@ async function main(): Promise<void> {
   console.log("Parsing ICS file...");
   const events = parseIcsFile(config.icsFilePath);
   console.log(`  Found ${events.length} events in ICS.`);
+  
+  // ラベル情報の確認専用モード（Google Calendarにはアクセスしない）
+  if (process.env.CHECK_LABELS === "true") {
+    const labelCounts = new Map<string, number>();
+
+    for (const event of events) {
+      for (const label of event.categories) {
+        labelCounts.set(label, (labelCounts.get(label) ?? 0) + 1);
+      }
+    }
+
+    console.log("\n=== TimeTree Label Check ===");
+    console.log(`Total events: ${events.length}`);
+    console.log(
+      `Events with categories: ${
+        events.filter((event) => event.categories.length > 0).length
+      }`
+    );
+    console.log("Category counts:");
+
+    for (const [label, count] of labelCounts) {
+      console.log(`  ${label}: ${count}`);
+    }
+
+    console.log("Label check finished. Google Calendar was not accessed.");
+    return;
+  }
+
 
   // 4. Google Calendar クライアント初期化
   const gcal = new GCalClient(config.googleCredentials, config.googleCalendarId);
