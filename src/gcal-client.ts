@@ -97,7 +97,12 @@ export class GCalClient {
   ): calendar_v3.Schema$Event {
     const body: calendar_v3.Schema$Event = {
       summary: event.summary,
-      description: event.description || undefined,
+      description: [
+  event.categories.length > 0
+    ? `【TimeTreeラベル】${event.categories.join("、")}`
+    : "",
+  event.description,
+].filter(Boolean).join("\n\n") || undefined,
       location: event.location || undefined,
       extendedProperties: {
         private: {
