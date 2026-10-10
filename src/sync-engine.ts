@@ -34,6 +34,7 @@ export class SyncEngine {
       if (!existing) {
         // Google Calendar に存在しない → 新規作成
         toCreate.push(event);
+        console.log(`CREATE candidate: ${event.summary} | UID: ${event.uid} | Start: ${event.start.toISOString()}`);
       } else {
         // 存在する → lastModified を比較して更新判定
         const sourceModified = event.lastModified?.toISOString() ?? "";
