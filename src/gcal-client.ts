@@ -114,14 +114,17 @@ export class GCalClient {
     };
 
     if (event.allDay) {
-      body.start = { date: formatDate(event.start) };
-      body.end = { date: formatDate(event.end) };
+      // PATCH preserves omitted fields: clear the opposite date representation.
+      body.start = { date: formatDate(event.start), dateTime: null, timeZone: null };
+      body.end = { date: formatDate(event.end), dateTime: null, timeZone: null };
 } else {
   body.start = {
+    date: null,
     dateTime: event.start.toISOString(),
     timeZone: "Asia/Tokyo",
   };
   body.end = {
+    date: null,
     dateTime: event.end.toISOString(),
     timeZone: "Asia/Tokyo",
   };
