@@ -1,0 +1,23 @@
+name: Temporary schedule diagnostic
+
+# Temporary probe for the stalled hourly sync. Remove after diagnosis.
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Confirm scheduler delivery without accessing calendar data
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          printf 'event=%s actor=%s commit=%s\n' "$EVENT_NAME" "$ACTOR" "$COMMIT_SHA"
+          date -u '+UTC=%Y-%m-%dT%H:%M:%SZ'
